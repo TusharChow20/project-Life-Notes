@@ -65,7 +65,7 @@ export default function Navbar() {
           />
         </a>
       </div>
-      <div className="navbar-end hidden lg:flex px-10">
+      <div className="navbar-end items-center hidden lg:flex ">
         <ul className="menu menu-horizontal px-1">
           {/* <li>Add Lessons</li>
           <li>My Lessons</li>

@@ -58,14 +58,14 @@ export default function Navbar() {
             </div>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl animate-pulse ">
+        <Link href={"/"} className="btn btn-ghost text-xl animate-pulse ">
           <Image
             src="/logo.png"
             width={90}
             height={60}
             alt="Digital Life Lessons Logo"
           />
-        </a>
+        </Link>
       </div>
       <div className="navbar-end items-center hidden lg:flex ">
         <ul className="menu menu-horizontal px-1">

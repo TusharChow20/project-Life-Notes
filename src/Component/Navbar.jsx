@@ -52,7 +52,9 @@ export default function Navbar() {
               </li>
             ))}
             <div>
-              <a className="btn w-full">Login</a>
+              <Link href={"/login"} className="btn">
+                Login
+              </Link>
             </div>
           </ul>
         </div>
@@ -77,7 +79,9 @@ export default function Navbar() {
           ))}
         </ul>
         <div>
-          <a className="btn">Login</a>
+          <Link href={"/login"} className="btn">
+            Login
+          </Link>
         </div>
       </div>
     </div>

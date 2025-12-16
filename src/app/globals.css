@@ -1,7 +1,6 @@
 @import "tailwindcss";
-@import "tailwindcss";
 @plugin "daisyui" {
-  themes: light --default, forest --prefersdark, cupcake;
+  themes: forest;
 }
 body {
   background: var(--background);

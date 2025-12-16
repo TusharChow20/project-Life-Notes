@@ -29,15 +29,14 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="min-h-[90vh] text-white">
+    <section className="max-h-[60vh] text-white">
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        
         <div className="space-y-6">
           <span className="inline-block px-4 py-1 rounded-full border border-green-400/40 text-green-400 text-sm">
             Digital Life Lessons 🌿
           </span>
 
-          <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold leading-tight">
+          <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold leading-tight">
             Turn Life Into <span className="text-green-400">Lessons</span>,
             <br />
             Lessons Into Growth
@@ -68,12 +67,12 @@ export default function HeroSection() {
           >
             {slides.map((slide, index) => (
               <SwiperSlide key={index}>
-                <div className="h-[420px] flex flex-col items-center justify-center text-center">
+                <div className="h-105 flex flex-col items-center justify-center text-center">
                   <Lottie
                     path={slide.animationPath}
                     loop
                     autoplay
-                    className="w-[300px] h-[300px]"
+                    className="w-75 h-75"
                   />
 
                   <h3 className="text-2xl font-semibold mt-6">{slide.title}</h3>

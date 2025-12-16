@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,12 +9,10 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
     console.log("Login submitted:", { email, password });
   };
 
   const handleGoogleLogin = () => {
-    // Handle Google login logic here
     console.log("Google login clicked");
   };
 
@@ -23,10 +20,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className=" rounded-2xl shadow-xl p-8 space-y-6">
-          {/* Logo and Header */}
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
                 <svg
                   className="w-8 h-8 text-white"
                   fill="none"
@@ -46,7 +42,6 @@ export default function Login() {
             <p className="">Sign in to continue your learning journey</p>
           </div>
 
-          {/* Google Login Button */}
           <button
             onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center cursor-pointer gap-3  border-2 border-gray-200 hover:border-gray-300 rounded-lg px-4 py-3 font-medium  transition-all hover:shadow-md"
@@ -71,8 +66,6 @@ export default function Login() {
             </svg>
             Continue with Google
           </button>
-
-          {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-gray-200"></div>
             <span className="text-sm font-medium">OR</span>
@@ -91,7 +84,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                 />
                 <svg
                   className="absolute right-3 top-3.5 w-5 h-5 text-gray-400"
@@ -122,7 +115,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                 />
                 <button
                   type="button"
@@ -167,33 +160,28 @@ export default function Login() {
                 </button>
               </div>
             </div>
-
-            {/* Forgot Password Link */}
             <div className="flex justify-end">
               <a
                 href="#"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
               >
                 Forgot password?
               </a>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full text-white bg-gradient-to-r from-blue-500 to-indigo-600  font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full text-white bg-gradient-to-r from-green-500 to-green-600  font-semibold py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               Sign In
             </button>
           </form>
-
-          {/* Register Link */}
           <div className="text-center pt-4 border-t border-gray-200">
             <p className="">
               Don't have an account?{" "}
               <Link
                 href="/register"
-                className="text-blue-600 hover:text-blue-700 font-semibold"
+                className="text-green-600 hover:text-green-700 font-semibold"
               >
                 Create Account
               </Link>

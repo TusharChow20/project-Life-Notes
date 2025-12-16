@@ -44,7 +44,7 @@ export default function Register() {
               <div className="flex justify-center mb-4">
                 <div className="avatar placeholder">
                   <div className="rounded-full w-16 border-2 flex justify-center items-center">
-                    <FaUser className="w-8 h-8 " />
+                    <FaUser className="w-8 h-8 text-green-400" />
                   </div>
                 </div>
               </div>
@@ -56,8 +56,14 @@ export default function Register() {
               onClick={handleGoogleSignup}
               className="btn btn-outline w-full gap-2"
             >
-              <FaGoogle className="w-5 h-5" />
-              Continue with Google
+              <FaGoogle className="w-5 h-5 text-green-300" />
+              Continue with{" "}
+              <span
+                className="text-bold text-green-400
+              "
+              >
+                Google
+              </span>
             </button>
 
             <div className="divider">OR</div>
@@ -177,16 +183,23 @@ export default function Register() {
               </div>
 
               {/* Submit Button */}
-              <button onClick={handleSubmit} className="btn w-full">
+              <button
+                onClick={handleSubmit}
+                className="btn w-full bg-green-500 text-white"
+              >
                 Create Account
               </button>
             </div>
 
             {/* Login Link */}
-            <div className="text-center pt-4 border-t">
+            <div className="text-center pt-4 border-t ">
               <p>
                 Already have an account?{" "}
-                <Link href="/login" className="link font-semibold">
+                <Link
+                  href="/login"
+                  className="link font-semibold text-green-400
+                "
+                >
                   Sign In
                 </Link>
               </p>

@@ -1,19 +1,19 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const { register, handleSubmit } = useForm();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login submitted:", { email, password });
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleLogin = () => {
     console.log("Google login clicked");
+  };
+
+  const handleFormSubmit = (data) => {
+    console.log(data);
   };
 
   return (
@@ -71,7 +71,7 @@ export default function Login() {
             <span className="text-sm font-medium">OR</span>
             <div className="flex-1 h-px bg-gray-200"></div>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium ">
                 Email Address
@@ -80,8 +80,7 @@ export default function Login() {
                 <input
                   id="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email", { required: true })}
                   placeholder="you@example.com"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
@@ -111,8 +110,7 @@ export default function Login() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password", { required: true })}
                   placeholder="Enter your password"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"

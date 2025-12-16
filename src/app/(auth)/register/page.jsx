@@ -9,26 +9,15 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { MdEmail, MdLock, MdPerson } from "react-icons/md";
+import { useForm } from "react-hook-form";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const { register, handleSubmit } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = () => {
-    console.log("Register submitted:", formData);
+  const handleFormSubmit = (data) => {
+    console.log(data);
   };
 
   const handleGoogleSignup = () => {
@@ -67,7 +56,10 @@ export default function Register() {
             </button>
 
             <div className="divider">OR</div>
-            <div className="space-y-4">
+            <form
+              onSubmit={handleSubmit(handleFormSubmit)}
+              className="space-y-4"
+            >
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Full Name</span>
@@ -76,10 +68,8 @@ export default function Register() {
                   <MdPerson className="w-5 h-5 opacity-70" />
                   <input
                     type="text"
-                    name="name"
+                    {...register("name", { required: true })}
                     placeholder="John Doe"
-                    value={formData.name}
-                    onChange={handleChange}
                     className="grow"
                     required
                   />
@@ -95,10 +85,8 @@ export default function Register() {
                   <MdEmail className="w-5 h-5 opacity-70" />
                   <input
                     type="email"
-                    name="email"
+                    {...register("email", { required: true })}
                     placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
                     className="grow"
                     required
                   />
@@ -114,10 +102,8 @@ export default function Register() {
                   <MdLock className="w-5 h-5 opacity-70" />
                   <input
                     type={showPassword ? "text" : "password"}
-                    name="password"
+                    {...register("password", { required: true })}
                     placeholder="Create a strong password"
-                    value={formData.password}
-                    onChange={handleChange}
                     className="grow"
                     required
                   />
@@ -146,8 +132,6 @@ export default function Register() {
                     type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     placeholder="Re-enter your password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
                     className="grow"
                     required
                   />
@@ -189,7 +173,7 @@ export default function Register() {
               >
                 Create Account
               </button>
-            </div>
+            </form>
 
             {/* Login Link */}
             <div className="text-center pt-4 border-t ">

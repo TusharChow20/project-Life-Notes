@@ -12,10 +12,15 @@ import { MdEmail, MdLock, MdPerson } from "react-icons/md";
 import { useForm } from "react-hook-form";
 
 export default function Register() {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const password = watch("password");
   const handleFormSubmit = (data) => {
     console.log(data);
   };
@@ -68,11 +73,22 @@ export default function Register() {
                   <MdPerson className="w-5 h-5 opacity-70" />
                   <input
                     type="text"
-                    {...register("name", { required: true })}
-                    placeholder="John Doe"
+                    {...register("name", {
+                      required: "Full name is required",
+                      minLength: {
+                        value: 3,
+                        message: "Name must be at least 3 characters",
+                      },
+                    })}
+                    placeholder="Tushar Chow"
                     className="grow"
-                    required
                   />
+
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </label>
               </div>
 
@@ -85,11 +101,22 @@ export default function Register() {
                   <MdEmail className="w-5 h-5 opacity-70" />
                   <input
                     type="email"
-                    {...register("email", { required: true })}
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^\S+@\S+\.\S+$/,
+                        message: "Enter a valid email address",
+                      },
+                    })}
                     placeholder="you@example.com"
                     className="grow"
-                    required
                   />
+
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </label>
               </div>
 
@@ -102,11 +129,23 @@ export default function Register() {
                   <MdLock className="w-5 h-5 opacity-70" />
                   <input
                     type={showPassword ? "text" : "password"}
-                    {...register("password", { required: true })}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                    })}
                     placeholder="Create a strong password"
                     className="grow"
-                    required
                   />
+
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -130,11 +169,21 @@ export default function Register() {
                   <MdLock className="w-5 h-5 opacity-70" />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
+                    {...register("confirmPassword", {
+                      required: "Confirm password is required",
+                      validate: (value) =>
+                        value === password || "Passwords do not match",
+                    })}
                     placeholder="Re-enter your password"
                     className="grow"
-                    required
                   />
+
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -152,7 +201,19 @@ export default function Register() {
               {/* Terms Checkbox */}
               <div className="form-control">
                 <label className="label cursor-pointer justify-start gap-2">
-                  <input type="checkbox" className="checkbox" required />
+                  <input
+                    type="checkbox"
+                    {...register("terms", {
+                      required: "You must accept the terms and privacy policy",
+                    })}
+                    className="checkbox"
+                  />
+                  {errors.terms && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.terms.message}
+                    </p>
+                  )}
+
                   <span className="label-text">
                     I agree to the{" "}
                     <a href="#" className="link">
@@ -168,6 +229,7 @@ export default function Register() {
 
               {/* Submit Button */}
               <button
+                type="submit"
                 onClick={handleSubmit}
                 className="btn w-full bg-green-500 text-white"
               >

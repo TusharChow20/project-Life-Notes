@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/Component/Navbar";
 import Footer from "@/Component/Footer";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,13 +26,15 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-7xl mx-auto`}
       >
-        <header>
-          <Navbar></Navbar>
-        </header>
-        <main className="min-h-[calc(100vh-285px)]">{children}</main>
-        <footer>
-          <Footer></Footer>
-        </footer>
+        <Providers>
+          <header>
+            <Navbar></Navbar>
+          </header>
+          <main className="min-h-[calc(100vh-285px)]">{children}</main>
+          <footer>
+            <Footer></Footer>
+          </footer>
+        </Providers>
       </body>
     </html>
   );

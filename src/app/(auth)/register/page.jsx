@@ -1,5 +1,4 @@
 "use client";
-import bcrypt from "bcryptjs";
 import React, { useState } from "react";
 import Link from "next/link";
 import {
@@ -12,35 +11,59 @@ import {
 import { MdEmail, MdLock, MdPerson } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import instance from "@/app/AxiosApi/AxiosInstence";
-// import instance from "@/app/AxiosApi/AxiosInstence";
+import { useQuery } from "@tanstack/react-query";
+import Swal from "sweetalert2";
 
 export default function Register() {
+  const { data: users = [] } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await instance.get("/userInfo");
+      return response.data;
+    },
+  });
   // const axiosInstance = instance();
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const password = watch("password");
+
   const handleFormSubmit = async (data) => {
-    const hashedPass = await bcrypt.hash(data.password, 10);
+    const userExits = users.find((user) => user.email === data.email);
+    if (userExits) {
+      Swal.fire({
+        icon: "error",
+        title: "User Already Exists",
+        text: "This email is already registered.",
+      });
+      return;
+    }
     const newUser = {
       name: data.name,
       email: data.email,
-      password: hashedPass,
-      role: "user",
-      createdAt: new Date().toISOString(),
+      password: data.password,
     };
-    await instance.post("/userInfo", newUser);
-  };
+    const res = await instance.post("/userInfo", newUser);
+    if (res.data?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Account Created!",
+        text: "You can now login.",
+        confirmButtonColor: "#22c55e",
+      });
 
+      reset();
+    }
+  };
   const handleGoogleSignup = () => {
     console.log("Google signup clicked");
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">
@@ -242,7 +265,6 @@ export default function Register() {
               {/* Submit Button */}
               <button
                 type="submit"
-                onClick={handleSubmit}
                 className="btn w-full bg-green-500 text-white"
               >
                 Create Account

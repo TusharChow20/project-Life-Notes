@@ -1,4 +1,5 @@
 "use client";
+import bcrypt from "bcryptjs";
 import React, { useState } from "react";
 import Link from "next/link";
 import {
@@ -10,8 +11,11 @@ import {
 } from "react-icons/fa";
 import { MdEmail, MdLock, MdPerson } from "react-icons/md";
 import { useForm } from "react-hook-form";
+import instance from "@/app/AxiosApi/AxiosInstence";
+// import instance from "@/app/AxiosApi/AxiosInstence";
 
 export default function Register() {
+  // const axiosInstance = instance();
   const {
     register,
     handleSubmit,
@@ -21,8 +25,16 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const password = watch("password");
-  const handleFormSubmit = (data) => {
-    console.log(data);
+  const handleFormSubmit = async (data) => {
+    const hashedPass = await bcrypt.hash(data.password, 10);
+    const newUser = {
+      name: data.name,
+      email: data.email,
+      password: hashedPass,
+      role: "user",
+      createdAt: new Date().toISOString(),
+    };
+    await instance.post("/userInfo", newUser);
   };
 
   const handleGoogleSignup = () => {

@@ -2,24 +2,72 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
-
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
+  const handleGoogleLogin = async () => {
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Google login error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Something went wrong with Google login",
+      });
+    }
   };
 
-  const handleFormSubmit = (data) => {
-    console.log(data);
+  const handleFormSubmit = async (data) => {
+    setLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (result?.error) {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: "Invalid email or password",
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful!",
+          text: "Welcome back!",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className=" rounded-2xl shadow-xl p-8 space-y-6">
+        <div className="rounded-2xl shadow-xl p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
@@ -38,13 +86,14 @@ export default function Login() {
                 </svg>
               </div>
             </div>
-            <h1 className="text-3xl font-bold ">Welcome Back</h1>
-            <p className="">Sign in to continue your learning journey</p>
+            <h1 className="text-3xl font-bold">Welcome Back</h1>
+            <p>Sign in to continue your learning journey</p>
           </div>
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center cursor-pointer gap-3  border-2 border-gray-200 hover:border-gray-300 rounded-lg px-4 py-3 font-medium  transition-all hover:shadow-md"
+            disabled={loading}
+            className="w-full flex items-center justify-center cursor-pointer gap-3 border-2 border-gray-200 hover:border-gray-300 rounded-lg px-4 py-3 font-medium transition-all hover:shadow-md disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -66,14 +115,16 @@ export default function Login() {
             </svg>
             Continue with Google
           </button>
+
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-gray-200"></div>
             <span className="text-sm font-medium">OR</span>
             <div className="flex-1 h-px bg-gray-200"></div>
           </div>
+
           <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium ">
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email Address
               </label>
               <div className="relative">
@@ -83,7 +134,8 @@ export default function Login() {
                   {...register("email", { required: true })}
                   placeholder="you@example.com"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                  disabled={loading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all disabled:opacity-50"
                 />
                 <svg
                   className="absolute right-3 top-3.5 w-5 h-5 text-gray-400"
@@ -101,9 +153,8 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Password Input */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium ">
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <div className="relative">
@@ -113,12 +164,14 @@ export default function Login() {
                   {...register("password", { required: true })}
                   placeholder="Enter your password"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                  disabled={loading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3.5"
+                  disabled={loading}
                 >
                   {showPassword ? (
                     <svg
@@ -158,6 +211,7 @@ export default function Login() {
                 </button>
               </div>
             </div>
+
             <div className="flex justify-end">
               <a
                 href="#"
@@ -169,14 +223,16 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full text-white bg-gradient-to-r from-green-500 to-green-600  font-semibold py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              disabled={loading}
+              className="w-full text-white bg-gradient-to-r from-green-500 to-green-600 font-semibold py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
+
           <div className="text-center pt-4 border-t border-gray-200">
-            <p className="">
-              Don't have an account?{" "}
+            <p>
+              Don&apos;t have an account?{" "}
               <Link
                 href="/register"
                 className="text-green-600 hover:text-green-700 font-semibold"
@@ -187,7 +243,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Footer Text */}
         <p className="text-center text-sm mt-6">
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>

@@ -22,7 +22,6 @@ export default function Register() {
       return response.data;
     },
   });
-  // const axiosInstance = instance();
   const {
     register,
     handleSubmit,

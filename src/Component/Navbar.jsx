@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -24,13 +25,6 @@ export default function Navbar() {
 
     if (result.isConfirmed) {
       await signOut({ callbackUrl: "/login" });
-      Swal.fire({
-        icon: "success",
-        title: "Logged Out",
-        text: "You have been successfully logged out",
-        timer: 1500,
-        showConfirmButton: false,
-      });
     }
   };
 
@@ -75,7 +69,7 @@ export default function Navbar() {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[999] mt-3 w-52 p-2 shadow"
           >
             {navLinks.map((link, index) => (
               <li key={index}>
@@ -89,85 +83,73 @@ export default function Navbar() {
               <li className="px-4 py-2">
                 <span className="loading loading-spinner loading-sm"></span>
               </li>
-            ) : session ? (
-              <>
-                <li className="menu-title px-4">
-                  <span className="text-xs">{session.user.email}</span>
-                </li>
-                <li>
-                  <Link href="/profile">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                      />
-                    </svg>
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <button onClick={handleLogout} className="text-error">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    Logout
-                  </button>
-                </li>
-              </>
             ) : (
-              <>
-                <li>
-                  <Link href="/login" className="btn btn-primary btn-sm w-full">
-                    Login
-                  </Link>
-                </li>
-                <li className="mt-2">
-                  <Link
-                    href="/register"
-                    className="btn btn-ghost btn-sm w-full"
-                  >
-                    Sign Up
-                  </Link>
-                </li>
-              </>
+              session && (
+                <>
+                  <li className="menu-title px-4 ">
+                    <span className="text-xs wrap-anywhere">
+                      {session.user.email}
+                    </span>
+                  </li>
+                  <li>
+                    <Link href="/profile">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/dashboard">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                        />
+                      </svg>
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <button onMouseDown={handleLogout} className="text-error">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Logout
+                    </button>
+                  </li>
+                </>
+              )
             )}
           </ul>
         </div>
@@ -199,10 +181,10 @@ export default function Navbar() {
         ) : session ? (
           <div className="flex items-center gap-3">
             {/* User Info */}
-            <div className="hidden xl:flex flex-col items-end">
+            {/* <div className="hidden xl:flex flex-col items-end">
               <span className="font-semibold text-sm">{session.user.name}</span>
               <span className="text-xs opacity-70">{session.user.email}</span>
-            </div>
+            </div> */}
 
             {/* Avatar Dropdown */}
             <div className="dropdown dropdown-end">
@@ -218,7 +200,7 @@ export default function Navbar() {
               </label>
               <ul
                 tabIndex={0}
-                className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+                className="mt-3 z-[999]  p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
               >
                 <li className="menu-title">
                   <span>Logged in as</span>
@@ -273,7 +255,7 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li>
-                  <button onClick={handleLogout} className="text-error">
+                  <button onMouseDown={handleLogout} className="text-error">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
@@ -298,9 +280,6 @@ export default function Navbar() {
           <div className="flex gap-2">
             <Link href="/login" className="btn btn-ghost btn-sm">
               Login
-            </Link>
-            <Link href="/register" className="btn btn-primary btn-sm">
-              Sign Up
             </Link>
           </div>
         )}

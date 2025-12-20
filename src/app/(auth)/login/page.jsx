@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 
 export default function Login() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const { register, handleSubmit } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,7 +16,7 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { callbackUrl });
     } catch (error) {
       console.error("Google login error:", error);
       Swal.fire({
@@ -49,7 +51,7 @@ export default function Login() {
           timer: 1500,
           showConfirmButton: false,
         });
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {

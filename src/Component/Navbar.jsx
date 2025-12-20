@@ -31,15 +31,15 @@ export default function Navbar() {
   const navLinks = [
     {
       name: "Add Lessons",
-      link: "/dashboard/add-lesson",
+      link: "/add-lesson",
     },
     {
       name: "My Lessons",
-      link: "/dashboard/my-lessons",
+      link: "/my-lessons",
     },
     {
       name: "Public Lessons",
-      link: "/dashboard/public-lessons",
+      link: "/public-lessons",
     },
     {
       name: "Pricing",

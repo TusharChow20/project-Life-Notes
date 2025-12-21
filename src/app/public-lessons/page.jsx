@@ -15,6 +15,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import instance from "../AxiosApi/AxiosInstence";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 function DarkSelect({ label, value, onChange, options }) {
   return (
     <div>
@@ -71,7 +72,9 @@ const emotionalTones = [
 ];
 
 export default function PublicLessonsPage() {
-  // Fetch lessons from backend
+  const { data: session } = useSession();
+  console.log("SESSION 👉", session);
+
   const {
     data: mockLessons = [],
     isLoading,
@@ -80,7 +83,7 @@ export default function PublicLessonsPage() {
     queryKey: ["publicLesson"],
     queryFn: async () => {
       const response = await instance.get("/publicLesson");
-      return response.data; // ← Important: return response.data
+      return response.data;
     },
   });
 
@@ -89,8 +92,7 @@ export default function PublicLessonsPage() {
   const [selectedTone, setSelectedTone] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Simulate user login status - replace with actual auth
-  const [isUserPremium, setIsUserPremium] = useState(false);
+  const isUserPremium = session?.user?.isPremium === true;
 
   const filteredLessons = mockLessons
     .filter((lesson) => {
@@ -172,7 +174,6 @@ export default function PublicLessonsPage() {
         {/* Demo Toggle (Remove in production) */}
         <div className="mb-6 flex justify-end">
           <button
-            onClick={() => setIsUserPremium(!isUserPremium)}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               isUserPremium
                 ? "bg-yellow-500 text-white"

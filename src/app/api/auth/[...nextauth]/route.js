@@ -24,6 +24,7 @@ export const authOptions = {
               email: response.data.user.email,
               name: response.data.user.name,
               role: response.data.user.role,
+              isPremium: response.data.user.isPremium,
             };
           }
 
@@ -44,7 +45,7 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account }) {
       console.log(account);
-      
+
       // Only handle Google sign-ins
       if (account.provider === "google") {
         try {
@@ -61,6 +62,7 @@ export const authOptions = {
               image: user.image,
               provider: "google",
               role: "user",
+              isPremium: false,
             };
 
             await instance.post("/userInfo", newUser);
@@ -78,23 +80,28 @@ export const authOptions = {
 
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role || "user";
         token.id = user.id;
+        token.isPremium = user.isPremium;
+        token.email = user.email;
       }
 
-      if (account?.provider === "google" && token.email) {
+      if (token.email) {
         try {
-          const response = await instance.get("/userInfo");
-          const dbUser = response.data.find((u) => u.email === token.email);
+          const response = await instance.get(`/users/${token.email}`);
+          const dbUser = response.data;
 
           if (dbUser) {
             token.id = dbUser._id;
             token.role = dbUser.role || "user";
+            token.isPremium = dbUser.isPremium || false;
+            token.name = dbUser.name;
+            token.picture = dbUser.image;
           }
         } catch (error) {
-          console.error("Error fetching Google user data:", error);
+          console.error("Error fetching user data:", error);
         }
       }
 
@@ -105,6 +112,7 @@ export const authOptions = {
       if (session.user) {
         session.user.role = token.role;
         session.user.id = token.id;
+        session.user.isPremium = token.isPremium;
       }
       return session;
     },

@@ -64,6 +64,7 @@ export default function PaymentSuccess() {
           queryClient.invalidateQueries(["user", session?.user?.email]);
 
           setTimeout(() => {
+            router.replace("/dashboard");
             setVerifying(false);
           }, 1500);
         } else {

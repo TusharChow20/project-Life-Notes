@@ -18,7 +18,7 @@ export default function Login() {
     try {
       await signIn("google", { callbackUrl });
     } catch (error) {
-      console.error("Google login error:", error);
+      // console.error("Google login error:", error);
       Swal.fire({
         icon: "error",
         title: "Login Failed",

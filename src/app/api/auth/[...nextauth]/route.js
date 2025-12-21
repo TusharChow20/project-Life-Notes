@@ -42,11 +42,62 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      console.log(account);
+      
+      // Only handle Google sign-ins
+      if (account.provider === "google") {
+        try {
+          const checkResponse = await instance.get(`/userInfo`);
+          const existingUser = checkResponse.data.find(
+            (u) => u.email === user.email
+          );
+
+          if (!existingUser) {
+            // Save new Google user to MongoDB
+            const newUser = {
+              name: user.name,
+              email: user.email,
+              image: user.image,
+              provider: "google",
+              role: "user",
+            };
+
+            await instance.post("/userInfo", newUser);
+            console.log("New Google user saved to MongoDB:", user.email);
+          } else {
+            console.log("Google user already exists:", user.email);
+          }
+
+          return true;
+        } catch (error) {
+          console.error("Error saving Google user:", error);
+          return true;
+        }
+      }
+
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
-        token.role = user.role;
+        token.role = user.role || "user";
         token.id = user.id;
       }
+
+      if (account?.provider === "google" && token.email) {
+        try {
+          const response = await instance.get("/userInfo");
+          const dbUser = response.data.find((u) => u.email === token.email);
+
+          if (dbUser) {
+            token.id = dbUser._id;
+            token.role = dbUser.role || "user";
+          }
+        } catch (error) {
+          console.error("Error fetching Google user data:", error);
+        }
+      }
+
       return token;
     },
 

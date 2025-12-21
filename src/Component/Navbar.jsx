@@ -5,11 +5,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import Swal from "sweetalert2";
+import { useQuery } from "@tanstack/react-query";
+import instance from "@/app/AxiosApi/AxiosInstence";
+import { Crown } from "lucide-react";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
-
   const router = useRouter();
+
+  // Fetch user data to check premium status
+  const { data: userData } = useQuery({
+    queryKey: ["user", session?.user?.email],
+    queryFn: async () => {
+      if (!session?.user?.email) return null;
+      const response = await instance.get(`/users?email=${session.user.email}`);
+      return response.data;
+    },
+    enabled: !!session?.user?.email,
+  });
+
+  const isPremium = userData?.isPremium || false;
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -28,7 +43,8 @@ export default function Navbar() {
     }
   };
 
-  const navLinks = [
+  // Base nav links
+  const baseNavLinks = [
     {
       name: "Add Lessons",
       link: "/add-lesson",
@@ -41,11 +57,17 @@ export default function Navbar() {
       name: "Public Lessons",
       link: "/public-lessons",
     },
-    {
-      name: "Pricing",
-      link: "/pricing",
-    },
   ];
+
+  const navLinks = isPremium
+    ? baseNavLinks
+    : [
+        ...baseNavLinks,
+        {
+          name: "Pricing",
+          link: "/pricing",
+        },
+      ];
 
   return (
     <div className="navbar bg-base-100 shadow-sm">
@@ -86,8 +108,11 @@ export default function Navbar() {
             ) : (
               session && (
                 <>
-                  <li className="menu-title px-4 ">
-                    <span className="text-xs wrap-anywhere">
+                  <li className="menu-title px-4">
+                    <span className="text-xs wrap-anywhere flex items-center gap-2">
+                      {isPremium && (
+                        <Crown className="w-4 h-4 text-yellow-500" />
+                      )}
                       {session.user.email}
                     </span>
                   </li>
@@ -173,26 +198,31 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Desktop Auth Section */}
         {status === "loading" ? (
           <div className="flex items-center gap-2 px-4">
             <span className="loading loading-spinner loading-sm"></span>
           </div>
         ) : session ? (
           <div className="flex items-center gap-3">
-            {/* User Info */}
-            {/* <div className="hidden xl:flex flex-col items-end">
-              <span className="font-semibold text-sm">{session.user.name}</span>
-              <span className="text-xs opacity-70">{session.user.email}</span>
-            </div> */}
+            {isPremium && (
+              <div className="badge badge-warning gap-2">
+                <Crown className="w-4 h-4" />
+                Premium
+              </div>
+            )}
 
-            {/* Avatar Dropdown */}
             <div className="dropdown dropdown-end">
               <label
                 tabIndex={0}
                 className="btn btn-ghost btn-circle avatar placeholder"
               >
-                <div className="w-10 rounded-full bg-green-500 text-white">
+                <div
+                  className={`w-10 rounded-full ${
+                    isPremium
+                      ? "bg-gradient-to-br from-yellow-400 to-orange-500"
+                      : "bg-green-500"
+                  } text-white`}
+                >
                   <span className="text-lg font-bold">
                     {session.user.name?.charAt(0).toUpperCase() || "U"}
                   </span>
@@ -200,19 +230,27 @@ export default function Navbar() {
               </label>
               <ul
                 tabIndex={0}
-                className="mt-3 z-[999]  p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+                className="mt-3 z-[999] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
               >
                 <li className="menu-title">
                   <span>Logged in as</span>
                 </li>
                 <li className="disabled px-4 py-2">
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold">
+                    <span className="text-sm font-semibold flex items-center gap-2">
                       {session.user.name}
+                      {isPremium && (
+                        <Crown className="w-4 h-4 text-yellow-500" />
+                      )}
                     </span>
                     <span className="text-xs opacity-70">
                       {session.user.email}
                     </span>
+                    {isPremium && (
+                      <span className="badge badge-warning badge-sm mt-1">
+                        Premium Member
+                      </span>
+                    )}
                   </div>
                 </li>
                 <div className="divider my-1"></div>

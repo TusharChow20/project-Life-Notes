@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Listbox } from "@headlessui/react";
 import {
   Search,
@@ -11,6 +11,9 @@ import {
   BookmarkPlus,
   Eye,
   ChevronDown,
+  ChevronRight,
+  ChevronRightCircle,
+  ChevronLeftCircle,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import instance from "../AxiosApi/AxiosInstence";
@@ -73,24 +76,51 @@ const emotionalTones = [
 
 export default function PublicLessonsPage() {
   const { data: session } = useSession();
-  console.log("SESSION 👉", session);
-
-  const {
-    data: mockLessons = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["publicLesson"],
-    queryFn: async () => {
-      const response = await instance.get("/publicLesson");
-      return response.data;
-    },
-  });
-
+  console.log("SESSION", session);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTone, setSelectedTone] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
+  const [page, setPage] = useState(1);
+
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: [
+      "publicLesson",
+      page,
+      selectedCategory,
+      selectedTone,
+      sortBy,
+      debouncedSearch,
+    ],
+    queryFn: async () => {
+      const response = await instance.get("/publicLesson", {
+        params: {
+          page,
+          limit: 9,
+          category: selectedCategory,
+          emotionalTone: selectedTone,
+          sortBy,
+          search: debouncedSearch,
+        },
+      });
+      return response.data;
+    },
+  });
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory, selectedTone, sortBy]);
+
+  const mockLessons = data?.lessons || [];
 
   const isUserPremium = session?.user?.isPremium === true;
 
@@ -171,7 +201,7 @@ export default function PublicLessonsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Demo Toggle (Remove in production) */}
+        {/* Demo Toggle */}
         <div className="mb-6 flex justify-end">
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
@@ -377,6 +407,70 @@ export default function PublicLessonsPage() {
             <p className="text-gray-500">
               Try adjusting your filters or search query
             </p>
+          </div>
+        )}
+
+        {/* Pagination Controls - Add this after the "No Results" section */}
+        {filteredLessons.length > 0 && data?.pagination && (
+          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap">
+            {/* Previous Button */}
+            <button
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={page === 1}
+              className={`
+        flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition-all
+        ${
+          page === 1
+            ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+            : "bg-white/10 text-white hover:bg-white/20"
+        }
+      `}
+            >
+              <ChevronLeftCircle className="w-4 h-4" />
+              Previous
+            </button>
+
+            {/* Page Numbers */}
+            {Array.from(
+              { length: data.pagination.totalPages },
+              (_, i) => i + 1
+            ).map((pageNum) => (
+              <button
+                key={pageNum}
+                onClick={() => setPage(pageNum)}
+                className={`
+          min-w-[40px] h-[40px] rounded-lg font-medium transition-all
+          ${
+            page === pageNum
+              ? "bg-gradient-to-r from-green-500 to-green-600 text-white scale-110 shadow-lg"
+              : "bg-white/10 text-white hover:bg-white/20"
+          }
+        `}
+              >
+                {pageNum}
+              </button>
+            ))}
+
+            {/* Next Button */}
+            <button
+              onClick={() =>
+                setPage((prev) =>
+                  Math.min(data.pagination.totalPages, prev + 1)
+                )
+              }
+              disabled={page === data.pagination.totalPages}
+              className={`
+        flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition-all
+        ${
+          page === data.pagination.totalPages
+            ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+            : "bg-white/10 text-white hover:bg-white/20"
+        }
+      `}
+            >
+              Next
+              <ChevronRightCircle className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>

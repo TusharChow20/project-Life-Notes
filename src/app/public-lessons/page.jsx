@@ -385,12 +385,13 @@ export default function PublicLessonsPage() {
                   </div>
 
                   {/* See Details Button */}
-                  <button
+                  <Link
+                    href={`/public-lessons/${lesson._id}`}
                     disabled={isPremiumLocked}
-                    className="w-full bg-gradient-to-r from-green-600 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-700 hover:to-green-700 transition disabled:opacity-50  disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-center bg-linear-to-r from-green-600 to-green-600 text-white py-3 rounded-xl font-semibold hover:from-green-700 hover:to-green-700 transition disabled:opacity-50  disabled:cursor-not-allowed cursor-pointer"
                   >
                     See Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             );

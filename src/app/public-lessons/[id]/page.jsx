@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   User,
   BookOpen,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -31,6 +32,9 @@ export default function LessonDetailsPage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [creatorLessonCount, setCreatorLessonCount] = useState(0);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -40,6 +44,27 @@ export default function LessonDetailsPage() {
     },
     enabled: Boolean(lessonId),
   });
+  useEffect(() => {
+    const fetchCreatorLessonCount = async () => {
+      if (!data?.creatorEmail) return;
+
+      try {
+        const response = await instance.get(
+          `/publicLesson/count?creatorEmail=${encodeURIComponent(
+            data.creatorEmail
+          )}`
+        );
+        setCreatorLessonCount(response.data.count || 0);
+      } catch (error) {
+        console.error("Failed to fetch creator lesson count:", error);
+        setCreatorLessonCount(0);
+      }
+    };
+
+    if (data?.creatorEmail) {
+      fetchCreatorLessonCount();
+    }
+  }, [data?.creatorEmail]);
 
   // Fetch like and favorite status
   useEffect(() => {
@@ -79,7 +104,10 @@ export default function LessonDetailsPage() {
   const isUserPremium = session?.user?.isPremium === true;
   const isPremiumLesson = data?.accessLevel === "premium";
   const isLocked = isPremiumLesson && !isUserPremium;
-
+  const isCreator =
+    session?.user?.email &&
+    data?.creatorEmail &&
+    session.user.email === data.creatorEmail;
   const calculateReadingTime = (text = "") => {
     const words = text.split(/\s+/).length;
     return Math.max(1, Math.ceil(words / 200));
@@ -137,6 +165,29 @@ export default function LessonDetailsPage() {
     } catch (error) {
       console.error("Failed to favorite:", error);
       alert("Failed to update favorite status");
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+
+    try {
+      const response = await instance.delete(`/publicLesson/${lessonId}`, {
+        data: { email: session.user.email },
+      });
+
+      if (response.data.success) {
+        alert("Lesson deleted successfully!");
+        window.location.href = "/public-lessons";
+      } else {
+        alert(response.data.message || "Failed to delete lesson");
+      }
+    } catch (error) {
+      console.error("Failed to delete:", error);
+      alert("Failed to delete lesson");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -277,7 +328,6 @@ export default function LessonDetailsPage() {
 
           {/* Content */}
           <div className="p-8">
-            {/* 1. Badges - Category, Tone, Access Level */}
             <div className="flex flex-wrap gap-2 mb-6">
               <span
                 className={`px-4 py-2 rounded-full text-sm font-semibold ${
@@ -384,11 +434,12 @@ export default function LessonDetailsPage() {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition transform hover:scale-105 ${
-                  isLiked
-                    ? "bg-red-500 text-white"
-                    : "bg-white/10 text-white hover:bg-white/20"
-                }`}
+                className={`flex items-center gap-2 cursor-pointer
+                   px-6 py-3 rounded-xl font-semibold transition transform hover:scale-105 ${
+                     isLiked
+                       ? "bg-red-500 text-white"
+                       : "bg-white/10 text-white hover:bg-white/20"
+                   }`}
               >
                 <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
                 {isLiked ? "Liked" : "Like"}
@@ -396,11 +447,12 @@ export default function LessonDetailsPage() {
 
               <button
                 onClick={handleFavorite}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition transform hover:scale-105 ${
-                  isFavorited
-                    ? "bg-blue-500 text-white"
-                    : "bg-white/10 text-white hover:bg-white/20"
-                }`}
+                className={`flex items-center gap-2 cursor-pointer
+                   px-6 py-3 rounded-xl font-semibold transition transform hover:scale-105 ${
+                     isFavorited
+                       ? "bg-blue-500 text-white"
+                       : "bg-white/10 text-white hover:bg-white/20"
+                   }`}
               >
                 <BookmarkPlus
                   className={`w-5 h-5 ${isFavorited ? "fill-current" : ""}`}
@@ -410,7 +462,8 @@ export default function LessonDetailsPage() {
 
               <button
                 onClick={() => setShowShareModal(true)}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-white/20 transition transform hover:scale-105"
+                className="flex items-center gap-2 cursor-pointer
+                 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-white/20 transition transform hover:scale-105"
               >
                 <Share2 className="w-5 h-5" />
                 Share
@@ -418,11 +471,21 @@ export default function LessonDetailsPage() {
 
               <button
                 onClick={() => setShowReportModal(true)}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition transform hover:scale-105"
+                className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition transform hover:scale-105"
               >
                 <Flag className="w-5 h-5" />
                 Report
               </button>
+
+              {isCreator && (
+                <button
+                  onClick={() => handleDelete()}
+                  className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition transform hover:scale-105"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  Delete
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -447,7 +510,7 @@ export default function LessonDetailsPage() {
               </h3>
               <p className="text-gray-300 mb-4">
                 <span className="font-semibold text-green-400">
-                  {data.creator?.totalLessons || 0}
+                  {creatorLessonCount}
                 </span>{" "}
                 lessons created
               </p>

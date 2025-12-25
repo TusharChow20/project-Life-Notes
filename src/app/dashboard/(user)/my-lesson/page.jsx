@@ -601,8 +601,3 @@ export default function MyLessonsPage() {
   );
 }
 <EditLessonModal></EditLessonModal>;
-// Edit Modal Component (Add this below the main component)
-// function EditLessonModal({ lesson, onClose, onSuccess }) {
-//   // Modal implementation will go here
-//   return null; // Placeholder
-// }

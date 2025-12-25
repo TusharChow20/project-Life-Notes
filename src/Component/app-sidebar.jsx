@@ -29,7 +29,7 @@ const items = [
   { title: "Dashboard Home", url: "/dashboard", icon: LayoutDashboard },
   { title: "Add Lesson", url: "/dashboard/add-lesson", icon: PlusCircle },
   { title: "My Lessons", url: "/dashboard/my-lesson", icon: BookOpen },
-  { title: "My Favorites", url: "/dashboard/favorites", icon: Heart },
+  { title: "My Favorites", url: "/dashboard/my-favourite", icon: Heart },
   { title: "Profile", url: "/dashboard/profile", icon: User },
 ];
 

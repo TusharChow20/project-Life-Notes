@@ -51,7 +51,7 @@ export default function Navbar() {
     },
     {
       name: "My Lessons",
-      link: "/my-lessons",
+      link: "/dashboard/my-lesson",
     },
     {
       name: "Public Lessons",

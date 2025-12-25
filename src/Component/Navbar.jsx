@@ -47,7 +47,7 @@ export default function Navbar() {
   const baseNavLinks = [
     {
       name: "Add Lessons",
-      link: "/add-lesson",
+      link: "/dashboard/add-lesson",
     },
     {
       name: "My Lessons",

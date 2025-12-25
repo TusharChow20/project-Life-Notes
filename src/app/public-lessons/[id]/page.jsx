@@ -36,7 +36,7 @@ export default function LessonDetailsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [creatorLessonCount, setCreatorLessonCount] = useState(0);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lesson", lessonId],
     queryFn: async () => {
       const res = await instance.get(`/publicLesson/${lessonId}`);
@@ -137,6 +137,7 @@ export default function LessonDetailsPage() {
 
       if (response.data.success) {
         setIsLiked(!isLiked);
+        refetch();
       }
     } catch (error) {
       console.error("Failed to like:", error);
@@ -161,6 +162,7 @@ export default function LessonDetailsPage() {
 
       if (response.data.success) {
         setIsFavorited(!isFavorited);
+        refetch();
       }
     } catch (error) {
       console.error("Failed to favorite:", error);

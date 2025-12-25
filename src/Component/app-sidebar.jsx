@@ -1,90 +1,95 @@
 "use client";
 
-import { Calendar, Home, Inbox, Search, Settings, User, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Home,
+  PlusCircle,
+  BookOpen,
+  Heart,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
-  { title: "My Lessons", url: "/dashboard/my-lesson", icon: Inbox },
-  { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
-  { title: "Search", url: "/dashboard/search", icon: Search },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  { title: "Dashboard Home", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Add Lesson", url: "/dashboard/add-lesson", icon: PlusCircle },
+  { title: "My Lessons", url: "/dashboard/my-lesson", icon: BookOpen },
+  { title: "My Favorites", url: "/dashboard/favorites", icon: Heart },
+  { title: "Profile", url: "/dashboard/profile", icon: User },
 ];
 
 export function AppSidebar() {
   const { data: session } = useSession();
-  const { setOpenMobile, isMobile } = useSidebar();
+  const pathname = usePathname();
 
   return (
-    <Sidebar>
-      {isMobile && (
-        <SidebarHeader>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold px-2">Menu</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpenMobile(false)}
-              className="md:hidden"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </SidebarHeader>
-      )}
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b border-sidebar-border py-4">
+        <div className="flex items-center justify-center px-2">
+          <SidebarTrigger />
+        </div>
+      </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="py-4">
+        <SidebarMenu>
+          {items.map((item) => {
+            const isActive = pathname === item.url;
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  isActive={isActive}
+                  className="data-[active=true]:bg-primary data-[active=true]:text-primary-content hover:bg-primary hover:text-primary-content"
+                >
+                  <Link href={item.url} className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="mt-auto border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg">
+            <SidebarMenuButton
+              asChild
+              size="lg"
+              tooltip={session?.user?.name || "Account"}
+            >
               <Link
                 href="/dashboard/profile"
                 className="flex items-center gap-3"
               >
-                <Image
-                  src={session?.user?.image || "/default-avatar.png"}
-                  width={8}
-                  height={8}
-                  alt={session?.user?.name || "User"}
-                  className="w-8 h-8 rounded-full"
-                />
+                <div className="relative w-8 h-8 flex-shrink-0">
+                  <Image
+                    src={session?.user?.image || "/default-avatar.png"}
+                    width={32}
+                    height={32}
+                    alt={session?.user?.name || "User"}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                </div>
                 <div className="flex flex-col items-start overflow-hidden">
                   <span className="text-sm font-medium truncate w-full">
                     {session?.user?.name || "User"}

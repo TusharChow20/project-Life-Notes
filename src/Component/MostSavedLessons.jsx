@@ -1,99 +1,25 @@
-
 "use client";
-
-import { useState } from "react";
-import {
-  Heart,
-  BookmarkPlus,
-  TrendingUp,
-  Loader2,
-  Eye,
-} from "lucide-react";
+import instance from "@/app/AxiosApi/AxiosInstence";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export function MostSavedLessons() {
-  const [savedLessons, setSavedLessons] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  useState(() => {
-    setTimeout(() => {
-      const mockData = [
-        {
-          _id: "1",
-          title: "Finding Strength in Vulnerability",
-          description:
-            "How opening up about struggles led to deeper connections and unexpected support from others.",
-          category: "Personal Growth",
-          emotionalTone: "Inspirational",
-          image: null,
-          creatorName: "Sarah J.",
-          likesCount: 234,
-          favoritesCount: 189,
-        },
-        {
-          _id: "2",
-          title: "The Power of Saying No",
-          description:
-            "Learning to set boundaries transformed my relationships and mental health for the better.",
-          category: "Self-Care",
-          emotionalTone: "Empowering",
-          image: null,
-          creatorName: "Michael C.",
-          likesCount: 198,
-          favoritesCount: 167,
-        },
-        {
-          _id: "3",
-          title: "Embracing Failure as Feedback",
-          description:
-            "My biggest business failure became the catalyst for my greatest success.",
-          category: "Career",
-          emotionalTone: "Reflective",
-          image: null,
-          creatorName: "Emma D.",
-          likesCount: 176,
-          favoritesCount: 156,
-        },
-        {
-          _id: "4",
-          title: "Gratitude Changed Everything",
-          description:
-            "A simple daily practice shifted my entire perspective on life and happiness.",
-          category: "Mindfulness",
-          emotionalTone: "Uplifting",
-          image: null,
-          creatorName: "James W.",
-          likesCount: 167,
-          favoritesCount: 142,
-        },
-        {
-          _id: "5",
-          title: "Listening More, Speaking Less",
-          description:
-            "How silence became my greatest teacher in understanding others.",
-          category: "Relationships",
-          emotionalTone: "Thoughtful",
-          image: null,
-          creatorName: "Olivia B.",
-          likesCount: 145,
-          favoritesCount: 128,
-        },
-        {
-          _id: "6",
-          title: "Starting Before You're Ready",
-          description:
-            "Waiting for the perfect moment was holding me back from my dreams.",
-          category: "Motivation",
-          emotionalTone: "Encouraging",
-          image: null,
-          creatorName: "David M.",
-          likesCount: 134,
-          favoritesCount: 118,
-        },
-      ];
-      setSavedLessons(mockData);
-      setIsLoading(false);
-    }, 600);
-  }, []);
+  const {
+    data: savedLessonsData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["mostSavedLessons"],
+    queryFn: async () => {
+      const res = await instance.get("/publicLesson?sortBy=mostSaved&limit=3");
+      return res.data;
+    },
+  });
+
+  const savedLessons = savedLessonsData?.lessons || [];
+  console.log("MostSavedLessons API:", savedLessonsData);
 
   if (isLoading) {
     return (
@@ -104,8 +30,15 @@ export function MostSavedLessons() {
       </section>
     );
   }
+  if (savedLessons.length === 0) {
+    return (
+      <section className="text-white text-center py-20">
+        No lessons found
+      </section>
+    );
+  }
 
-  if (error || savedLessons.length === 0) {
+  if (error) {
     return null;
   }
 
@@ -113,7 +46,6 @@ export function MostSavedLessons() {
     <section className="max-w-7xl mx-auto px-6 py-20 bg-gradient-to-b from-transparent via-green-900/5 to-transparent">
       <div className="mb-10">
         <h2 className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3">
-          <BookmarkPlus className="w-8 h-8 text-blue-400" />
           Most Saved Lessons
         </h2>
         <p className="text-green-300 mt-2 max-w-xl">
@@ -123,27 +55,52 @@ export function MostSavedLessons() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {savedLessons.slice(0, 6).map((lesson, index) => (
-          <div
+        {savedLessons.map((lesson, index) => (
+          <a
             key={lesson._id}
-            className="group relative border border-green-400/20 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-xl hover:shadow-green-400/20 transition-all duration-300 cursor-pointer"
+            href={`/public-lessons/${lesson._id}`}
+            className="group relative border border-green-400/20 rounded-2xl overflow-hidden hover:border-green-400 hover:shadow-xl hover:shadow-green-400/20 transition-all duration-300"
           >
-            {/* Trending Badge */}
             {index < 3 && (
-              <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
+              <div className="absolute top-3 left-3 z-10 bg-linear-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  ></path>
+                </svg>
                 Trending
               </div>
             )}
 
-            {/* Placeholder Image */}
-            <div className="relative w-full h-48 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-              <div className="text-6xl">
-                {index % 3 === 0 ? "🌱" : index % 3 === 1 ? "💭" : "✨"}
+            {lesson.image ? (
+              <div className="relative w-full h-48 overflow-hidden">
+                <Image
+                  width={500}
+                  height={100}
+                  src={lesson.image}
+                  alt={lesson.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
-            </div>
+            ) : (
+              <div className="relative w-full h-48 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                <div className="text-6xl">
+                  {index % 3 === 0 ? "🌱" : index % 3 === 1 ? "💭" : "✨"}
+                </div>
+              </div>
+            )}
 
+            {/* Content */}
             <div className="p-6">
+              {/* Badges */}
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-semibold">
                   {lesson.category}
@@ -172,25 +129,70 @@ export function MostSavedLessons() {
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <div className="flex items-center gap-1 text-red-400">
-                    <Heart className="w-4 h-4" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      ></path>
+                    </svg>
                     <span>{lesson.likesCount || 0}</span>
                   </div>
                   <div className="flex items-center gap-1 text-blue-400 font-bold">
-                    <BookmarkPlus className="w-4 h-4" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                      ></path>
+                    </svg>
                     <span>{lesson.favoritesCount || 0}</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
       <div className="flex justify-center mt-12">
-        <button className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition transform hover:scale-105 flex items-center gap-2">
+        <Link
+          href="/public-lessons"
+          className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition transform hover:scale-105 flex items-center gap-2"
+        >
           Explore All Lessons
-          <Eye className="w-5 h-5 group-hover:translate-x-1 transition" />
-        </button>
+          <svg
+            className="w-5 h-5 group-hover:translate-x-1 transition"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            ></path>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            ></path>
+          </svg>
+        </Link>
       </div>
     </section>
   );

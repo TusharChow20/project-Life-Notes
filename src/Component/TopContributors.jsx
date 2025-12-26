@@ -1,76 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Award,
-  Target,
-  Loader2,
-  Crown,
-  Star,
-} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import instance from "@/app/AxiosApi/AxiosInstence";
+import { Crown, Star, Target, Award, Loader2 } from "lucide-react";
 
 export function TopContributors() {
-  const [contributors, setContributors] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useState(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockData = [
-        {
-          _id: "1",
-          name: "Sarah Johnson",
-          avatar: null,
-          bio: "Life coach and mindfulness advocate",
-          lessonsCount: 42,
-          totalLikes: 856,
-        },
-        {
-          _id: "2",
-          name: "Michael Chen",
-          avatar: null,
-          bio: "Entrepreneur sharing startup wisdom",
-          lessonsCount: 38,
-          totalLikes: 723,
-        },
-        {
-          _id: "3",
-          name: "Emma Davis",
-          avatar: null,
-          bio: "Personal development enthusiast",
-          lessonsCount: 35,
-          totalLikes: 645,
-        },
-        {
-          _id: "4",
-          name: "James Wilson",
-          avatar: null,
-          bio: "Career mentor and growth advocate",
-          lessonsCount: 29,
-          totalLikes: 512,
-        },
-        {
-          _id: "5",
-          name: "Olivia Brown",
-          avatar: null,
-          bio: "Wellness and self-care expert",
-          lessonsCount: 27,
-          totalLikes: 489,
-        },
-        {
-          _id: "6",
-          name: "David Martinez",
-          avatar: null,
-          bio: "Leadership coach",
-          lessonsCount: 24,
-          totalLikes: 432,
-        },
-      ];
-      setContributors(mockData);
-      setIsLoading(false);
-    }, 500);
-  }, []);
+  const {
+    data: contributors = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["topContributors"],
+    queryFn: async () => {
+      const res = await instance.get("/top-contributors?limit=3");
+      return res.data;
+    },
+  });
 
   if (isLoading) {
     return (
@@ -100,10 +45,10 @@ export function TopContributors() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contributors.slice(0, 6).map((contributor, index) => (
+        {contributors.map((contributor, index) => (
           <div
             key={contributor._id}
-            className="relative group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm border border-green-400/20 rounded-2xl p-6 hover:border-green-400 hover:shadow-xl hover:shadow-green-400/20 transition-all duration-300"
+            className="relative group  backdrop-blur-sm border border-green-400/20 rounded-2xl p-6 hover:border-green-400 hover:shadow-xl hover:shadow-green-400/20 transition-all duration-300"
           >
             {/* Rank Badge */}
             {index < 3 && (
@@ -116,17 +61,17 @@ export function TopContributors() {
               {/* Avatar */}
               <div className="relative">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xl font-bold ring-2 ring-green-400/50">
-                  {contributor.name.charAt(0)}
+                  {contributor.creatorName?.charAt(0) || "?"}
                 </div>
               </div>
 
               {/* Info */}
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white group-hover:text-green-400 transition">
-                  {contributor.name}
+                  {contributor.creatorName || "Anonymous"}
                 </h3>
                 <p className="text-sm text-green-300 mb-3">
-                  {contributor.bio || "Wisdom sharer"}
+                  {contributor.creatorEmail}
                 </p>
 
                 {/* Stats */}
@@ -150,11 +95,28 @@ export function TopContributors() {
 
             {/* Footer */}
             <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
-              <span className="text-xs text-gray-400">This week</span>
-              <button className="text-sm text-green-400 hover:text-green-300 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                View Profile
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-xs text-gray-400">
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                    ></path>
+                  </svg>
+                  <span>{contributor.totalFavorites} saves</span>
+                </div>
+              </div>
+              <span className="text-xs text-green-400 font-medium flex items-center gap-1">
                 <Award className="w-4 h-4" />
-              </button>
+                Top Creator
+              </span>
             </div>
           </div>
         ))}

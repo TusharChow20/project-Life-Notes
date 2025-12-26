@@ -23,7 +23,8 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import instance from "@/app/AxiosApi/AxiosInstence";
 import Image from "next/image";
-
+import Swal from "sweetalert2";
+import { X, Loader2 } from "lucide-react";
 export default function LessonDetailsPage() {
   const { id: lessonId } = useParams();
   const { data: session } = useSession();
@@ -32,9 +33,83 @@ export default function LessonDetailsPage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [creatorLessonCount, setCreatorLessonCount] = useState(0);
+
+  const reportReasons = [
+    "Spam or misleading",
+    "Hate speech or harassment",
+    "Sexual or inappropriate content",
+    "Violence or harmful behavior",
+    "Copyright infringement",
+    "Other",
+  ];
+  const onClose = () => {
+    setShowReportModal(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!session?.user) {
+      Swal.fire({
+        icon: "error",
+        title: "Not Logged In",
+        text: "Please log in to report content",
+      });
+      return;
+    }
+
+    if (!selectedReason) {
+      Swal.fire({
+        icon: "error",
+        title: "Select a Reason",
+        text: "Please select a reason for reporting",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await instance.post("/reports", {
+        lessonId,
+        lessonTitle,
+        reporterId: session.user._id || session.user.id,
+        reporterName: session.user.name,
+        reporterEmail: session.user.email,
+        reason: selectedReason,
+        description: description.trim(),
+      });
+
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Report Submitted",
+          text: "Thank you for helping us keep the community safe. We'll review your report.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        onClose();
+        setSelectedReason("");
+        setDescription("");
+      }
+    } catch (error) {
+      console.error("Report error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Submit",
+        text:
+          error.response?.data?.message ||
+          "Failed to submit report. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lesson", lessonId],
@@ -44,6 +119,8 @@ export default function LessonDetailsPage() {
     },
     enabled: Boolean(lessonId),
   });
+  const lessonTitle = data?.title || "Untitled Lesson";
+
   useEffect(() => {
     const fetchCreatorLessonCount = async () => {
       if (!data?.creatorEmail) return;
@@ -472,7 +549,9 @@ export default function LessonDetailsPage() {
               </button>
 
               <button
-                onClick={() => setShowReportModal(true)}
+                onClick={() =>
+                  document.getElementById("report_modal")?.showModal()
+                }
                 className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition transform hover:scale-105"
               >
                 <Flag className="w-5 h-5" />
@@ -584,48 +663,75 @@ export default function LessonDetailsPage() {
 
         {/* Report Modal */}
         {showReportModal && (
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowReportModal(false)}
-          >
-            <div
-              className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Report this lesson
-              </h3>
-              <p className="text-gray-300 mb-6">
-                Please select a reason for reporting this content:
-              </p>
-              <div className="space-y-3 mb-6">
-                {[
-                  "Inappropriate content",
-                  "Spam",
-                  "Misleading information",
-                  "Copyright violation",
-                  "Other",
-                ].map((reason) => (
-                  <button
-                    key={reason}
-                    className="w-full text-left px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition"
-                    onClick={() => {
-                      alert(`Reported for: ${reason}`);
-                      setShowReportModal(false);
-                    }}
-                  >
-                    {reason}
+          <dialog id="report_modal" className="modal">
+            <div className="modal-box bg-gray-900 border border-white/20 max-w-md">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Flag className="w-6 h-6 text-red-400" />
+                  Report Lesson
+                </h3>
+
+                {/* Close button */}
+                <form method="dialog">
+                  <button className="p-2 hover:bg-white/10 rounded-lg">
+                    <X className="w-6 h-6 text-gray-400" />
                   </button>
-                ))}
+                </form>
               </div>
-              <button
-                onClick={() => setShowReportModal(false)}
-                className="w-full px-4 py-3 text-gray-400 hover:text-white transition"
-              >
-                Cancel
-              </button>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} method="dialog">
+                <p className="text-gray-400 mb-4">
+                  Lesson: <span className="text-white">{lessonTitle}</span>
+                </p>
+
+                <div className="space-y-2 mb-4">
+                  {reportReasons.map((reason) => (
+                    <label
+                      key={reason}
+                      className={`flex items-center p-3 rounded-xl cursor-pointer ${
+                        selectedReason === reason
+                          ? "bg-red-500/20 border-2 border-red-500"
+                          : "bg-white/5 hover:bg-white/10"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="reason"
+                        value={reason}
+                        checked={selectedReason === reason}
+                        onChange={(e) => setSelectedReason(e.target.value)}
+                        className="radio radio-error"
+                      />
+                      <span className="ml-3 text-white">{reason}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Additional details (optional)"
+                  rows={4}
+                  className="textarea textarea-bordered w-full mb-4 bg-gray-800 text-white"
+                  maxLength={500}
+                />
+
+                <div className="modal-action">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !selectedReason}
+                    className="btn btn-error"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Report"}
+                  </button>
+
+                  <button className="btn btn-ghost">Cancel</button>
+                </div>
+              </form>
             </div>
-          </div>
+          </dialog>
         )}
       </div>
     </div>

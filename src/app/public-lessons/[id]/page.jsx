@@ -392,7 +392,7 @@ export default function LessonDetailsPage() {
         </Link>
 
         {/* Main Content Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden mb-8">
+        <div className=" backdrop-blur-lg rounded-2xl overflow-hidden mb-8">
           {/* Featured Image */}
           {data.image && (
             <div className="relative w-full h-80">
@@ -573,7 +573,7 @@ export default function LessonDetailsPage() {
         </div>
 
         {/* 7. Author Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-8">
+        <div className=" border shadow-xl backdrop-blur-lg rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-white mb-6">
             About the Author
           </h2>

@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import instance from "../AxiosApi/AxiosInstence";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 function DarkSelect({ label, value, onChange, options }) {
   return (
     <div>
@@ -255,7 +256,7 @@ export default function PublicLessonsPage() {
 
         {/* Results Count */}
         <div className="mb-6">
-          <p className="text-gray-600 font-medium">
+          <p className="text-gray-200 font-medium">
             Showing {filteredLessons.length} lesson
             {filteredLessons.length !== 1 ? "s" : ""}
           </p>
@@ -339,14 +340,15 @@ export default function PublicLessonsPage() {
                     </span>
                   </div>
 
-                  {/* Creator Info */}
                   <div className="flex items-center gap-3 mb-4 pb-4 border-b">
-                    <img
+                    <Image
                       src={
                         lesson?.creatorPhoto ||
                         "https://i.pravatar.cc/150?img=1"
                       }
                       alt={lesson?.creatorName || "User"}
+                      width={10}
+                      height={10}
                       className="w-10 h-10 rounded-full object-cover"
                       onError={(e) => {
                         e.target.src = "https://i.pravatar.cc/150?img=1";

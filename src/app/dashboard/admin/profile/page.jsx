@@ -376,7 +376,7 @@ export default function AdminProfilePage() {
         </div>
 
         {/* Recent Activity Timeline */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
+        <div className=" backdrop-blur-lg rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
             <Award className="w-6 h-6 text-purple-400" />
             Recent Activity
@@ -436,7 +436,7 @@ export default function AdminProfilePage() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/admin/lessons"
-            className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
+            className="flex items-center gap-3 p-4 shadow-xl backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
           >
             <BookOpen className="w-6 h-6 text-green-400" />
             <div>
@@ -449,7 +449,7 @@ export default function AdminProfilePage() {
 
           <Link
             href="/admin/users"
-            className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
+            className="flex items-center gap-3 p-4 shadow-xl backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
           >
             <Users className="w-6 h-6 text-blue-400" />
             <div>
@@ -460,7 +460,7 @@ export default function AdminProfilePage() {
 
           <Link
             href="/admin/reports"
-            className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
+            className="flex items-center gap-3 p-4 shadow-xl backdrop-blur-lg rounded-xl hover:bg-white/20 transition"
           >
             <Flag className="w-6 h-6 text-yellow-400" />
             <div>

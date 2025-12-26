@@ -100,7 +100,6 @@ export default function AdminManageLessonsPage() {
     },
   });
 
-  // Mark as reviewed mutation
   const markReviewedMutation = useMutation({
     mutationFn: async (lessonId) => {
       const response = await instance.put(`/admin/lessons/${lessonId}/review`, {
@@ -244,7 +243,7 @@ export default function AdminManageLessonsPage() {
                 {data.stats.totalLessons}
               </p>
             </div>
-            <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-lg rounded-xl p-4 border border-green-400/30">
+            <div className="bg-linear-to-br from-green-500/20 to-green-600/20 backdrop-blur-lg rounded-xl p-4 border border-green-400/30">
               <div className="flex items-center gap-2 mb-2">
                 <Globe className="w-5 h-5 text-green-300" />
                 <p className="text-green-300 text-sm font-semibold">Public</p>
@@ -253,7 +252,7 @@ export default function AdminManageLessonsPage() {
                 {data.stats.publicLessons}
               </p>
             </div>
-            <div className="bg-gradient-to-br from-gray-500/20 to-gray-600/20 backdrop-blur-lg rounded-xl p-4 border border-gray-400/30">
+            <div className="bg-linear-to-br from-gray-500/20 to-gray-600/20 backdrop-blur-lg rounded-xl p-4 border border-gray-400/30">
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="w-5 h-5 text-gray-300" />
                 <p className="text-gray-300 text-sm font-semibold">Private</p>
@@ -262,7 +261,7 @@ export default function AdminManageLessonsPage() {
                 {data.stats.privateLessons}
               </p>
             </div>
-            <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 backdrop-blur-lg rounded-xl p-4 border border-yellow-400/30">
+            <div className="bg-linear-to-br from-yellow-500/20 to-yellow-600/20 backdrop-blur-lg rounded-xl p-4 border border-yellow-400/30">
               <div className="flex items-center gap-2 mb-2">
                 <Star className="w-5 h-5 text-yellow-300" />
                 <p className="text-yellow-300 text-sm font-semibold">
@@ -273,7 +272,7 @@ export default function AdminManageLessonsPage() {
                 {data.stats.featuredLessons}
               </p>
             </div>
-            <div className="bg-gradient-to-br from-red-500/20 to-red-600/20 backdrop-blur-lg rounded-xl p-4 border border-red-400/30">
+            <div className="bg-linear-to-br from-red-500/20 to-red-600/20 backdrop-blur-lg rounded-xl p-4 border border-red-400/30">
               <div className="flex items-center gap-2 mb-2">
                 <Flag className="w-5 h-5 text-red-300" />
                 <p className="text-red-300 text-sm font-semibold">Reported</p>
@@ -286,7 +285,7 @@ export default function AdminManageLessonsPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
+        <div className=" backdrop-blur-lg rounded-2xl p-6 mb-6 border border-white/20">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="w-5 h-5 text-white" />
             <h2 className="text-white font-semibold">Filters</h2>
@@ -384,7 +383,7 @@ export default function AdminManageLessonsPage() {
         </div>
 
         {/* Lessons Grid */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+        <div className=" backdrop-blur-lg rounded-2xl p-6 border border-white/20">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-12 h-12 text-green-400 animate-spin" />

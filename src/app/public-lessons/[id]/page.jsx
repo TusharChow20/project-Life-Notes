@@ -31,7 +31,7 @@ export default function LessonDetailsPage() {
 
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
+  // const [showReportModal, setShowReportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
   const [description, setDescription] = useState("");
@@ -47,9 +47,9 @@ export default function LessonDetailsPage() {
     "Copyright infringement",
     "Other",
   ];
-  const onClose = () => {
-    setShowReportModal(false);
-  };
+  // const onClose = () => {
+  //   setShowReportModal(false);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,12 +93,12 @@ export default function LessonDetailsPage() {
           timer: 3000,
           showConfirmButton: false,
         });
-        onClose();
+        document.getElementById("report_modal")?.close();
+
         setSelectedReason("");
         setDescription("");
       }
     } catch (error) {
-      console.error("Report error:", error);
       Swal.fire({
         icon: "error",
         title: "Failed to Submit",
@@ -106,6 +106,7 @@ export default function LessonDetailsPage() {
           error.response?.data?.message ||
           "Failed to submit report. Please try again.",
       });
+      document.getElementById("report_modal")?.close();
     } finally {
       setIsSubmitting(false);
     }
@@ -662,77 +663,75 @@ export default function LessonDetailsPage() {
         )}
 
         {/* Report Modal */}
-        {showReportModal && (
-          <dialog id="report_modal" className="modal">
-            <div className="modal-box bg-gray-900 border border-white/20 max-w-md">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Flag className="w-6 h-6 text-red-400" />
-                  Report Lesson
-                </h3>
+        <dialog id="report_modal" className="modal">
+          <div className="modal-box bg-gray-900 border border-white/20 max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Flag className="w-6 h-6 text-red-400" />
+                Report Lesson
+              </h3>
 
-                {/* Close button */}
-                <form method="dialog">
-                  <button className="p-2 hover:bg-white/10 rounded-lg">
-                    <X className="w-6 h-6 text-gray-400" />
-                  </button>
-                </form>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} method="dialog">
-                <p className="text-gray-400 mb-4">
-                  Lesson: <span className="text-white">{lessonTitle}</span>
-                </p>
-
-                <div className="space-y-2 mb-4">
-                  {reportReasons.map((reason) => (
-                    <label
-                      key={reason}
-                      className={`flex items-center p-3 rounded-xl cursor-pointer ${
-                        selectedReason === reason
-                          ? "bg-red-500/20 border-2 border-red-500"
-                          : "bg-white/5 hover:bg-white/10"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="reason"
-                        value={reason}
-                        checked={selectedReason === reason}
-                        onChange={(e) => setSelectedReason(e.target.value)}
-                        className="radio radio-error"
-                      />
-                      <span className="ml-3 text-white">{reason}</span>
-                    </label>
-                  ))}
-                </div>
-
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Additional details (optional)"
-                  rows={4}
-                  className="textarea textarea-bordered w-full mb-4 bg-gray-800 text-white"
-                  maxLength={500}
-                />
-
-                <div className="modal-action">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !selectedReason}
-                    className="btn btn-error"
-                  >
-                    {isSubmitting ? "Submitting..." : "Submit Report"}
-                  </button>
-
-                  <button className="btn btn-ghost">Cancel</button>
-                </div>
+              {/* Close button */}
+              <form method="dialog">
+                <button className="p-2 hover:bg-white/10 rounded-lg">
+                  <X className="w-6 h-6 text-gray-400" />
+                </button>
               </form>
             </div>
-          </dialog>
-        )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} method="dialog">
+              <p className="text-gray-400 mb-4">
+                Lesson: <span className="text-white">{lessonTitle}</span>
+              </p>
+
+              <div className="space-y-2 mb-4">
+                {reportReasons.map((reason) => (
+                  <label
+                    key={reason}
+                    className={`flex items-center p-3 rounded-xl cursor-pointer ${
+                      selectedReason === reason
+                        ? "bg-red-500/20 border-2 border-red-500"
+                        : "bg-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="reason"
+                      value={reason}
+                      checked={selectedReason === reason}
+                      onChange={(e) => setSelectedReason(e.target.value)}
+                      className="radio radio-error"
+                    />
+                    <span className="ml-3 text-white">{reason}</span>
+                  </label>
+                ))}
+              </div>
+
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Additional details (optional)"
+                rows={4}
+                className="textarea textarea-bordered w-full mb-4 bg-gray-800 text-white"
+                maxLength={500}
+              />
+
+              <div className="modal-action">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !selectedReason}
+                  className="btn btn-error"
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Report"}
+                </button>
+
+                <button className="btn btn-ghost">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </dialog>
       </div>
     </div>
   );

@@ -80,9 +80,17 @@ export default function HeroSection() {
           </p>
 
           <div className="flex gap-4 pt-2 lg:pt-4 justify-center lg:justify-start">
-            <button className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold text-green-950 text-sm lg:text-base">
+            <button
+              onClick={() => {
+                document
+                  .getElementById("featured-lesson")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold text-green-950"
+            >
               Get Started
             </button>
+
             <button className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl border border-green-400/40 hover:bg-green-400/10 text-sm lg:text-base">
               Explore Lessons
             </button>

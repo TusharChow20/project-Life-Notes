@@ -1,26 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Lottie from "lottie-react";
 
 export default function GlobalLoading() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [animationData, setAnimationData] = useState(null);
 
+  // Load Lottie animation once
   useEffect(() => {
     fetch("/lottie/lottiLoading.json")
       .then((res) => res.json())
       .then((data) => setAnimationData(data));
   }, []);
 
+  // Trigger loader on route change
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   if (!loading) return null;
 
@@ -30,11 +31,11 @@ export default function GlobalLoading() {
         {animationData ? (
           <Lottie
             animationData={animationData}
-            loop={true}
+            loop
             style={{ width: 250, height: 250 }}
           />
         ) : (
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-300 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-300 mx-auto" />
         )}
         <p className="text-white text-lg font-semibold mt-4">Loading...</p>
       </div>

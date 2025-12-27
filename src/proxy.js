@@ -1,30 +1,54 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+
 const privateRoutes = ["/add-lesson", "/my-lessons"];
-// This function can be marked `async` if using `await` inside
+
 export async function proxy(request) {
-  //
-  const token = await getToken({ req: request });
-  // console.log(token);
+  const { pathname } = request.nextUrl;
 
-  const reqPath = request.nextUrl.pathname;
-  const isPrivate = privateRoutes.some((route) => reqPath.startsWith(route));
-  const isAuthenticated = Boolean(token);
-  // console.log({ reqPath, isPrivate });
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  if (!isAuthenticated && isPrivate) {
+  // Public routes
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/api/auth")
+  ) {
+    return NextResponse.next();
+  }
+
+  const isPrivate = privateRoutes.some((route) => pathname.startsWith(route));
+
+  // Auth protection
+  if (!token && isPrivate) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", reqPath);
+    loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Role-based routing
+  if (token) {
+    const userRole = token.role;
+
+    if (pathname.startsWith("/dashboard/admin") && userRole !== "admin") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    if (
+      pathname.startsWith("/dashboard") &&
+      !pathname.startsWith("/dashboard/admin") &&
+      userRole === "admin"
+    ) {
+      return NextResponse.redirect(new URL("/dashboard/admin", request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
-// Alternatively, you can use a default export:
-// export default function proxy(request) { ... }
-
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/add-lesson/:path*", "/my-lessons/:path*"],
+  matcher: ["/add-lesson/:path*", "/my-lessons/:path*", "/dashboard/:path*"],
 };

@@ -55,7 +55,7 @@ export function FeaturedLessons() {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20">
+    <section id="featured-lesson" className="max-w-7xl mx-auto px-6 py-20">
       <div className="mb-10">
         <h2 className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3">
           <Star className="w-8 h-8 text-yellow-400 fill-yellow-400" />

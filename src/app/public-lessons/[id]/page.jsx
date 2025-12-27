@@ -25,6 +25,7 @@ import instance from "@/app/AxiosApi/AxiosInstence";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { X, Loader2 } from "lucide-react";
+import { LessonDetailsSkeleton } from "@/Component/Skeletons";
 export default function LessonDetailsPage() {
   const { id: lessonId } = useParams();
   const { data: session } = useSession();
@@ -299,14 +300,7 @@ export default function LessonDetailsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-300 mx-auto mb-4"></div>
-          <p className="text-white font-medium">Loading lesson...</p>
-        </div>
-      </div>
-    );
+    return <LessonDetailsSkeleton />;
   }
 
   if (error || !data) {

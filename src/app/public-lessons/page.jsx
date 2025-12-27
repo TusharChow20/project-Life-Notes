@@ -20,6 +20,7 @@ import instance from "../AxiosApi/AxiosInstence";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { LessonCardSkeleton } from "@/Component/Skeletons";
 function DarkSelect({ label, value, onChange, options }) {
   return (
     <div>
@@ -164,10 +165,24 @@ export default function PublicLessonsPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-300 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading lessons...</p>
+      <div className="min-h-screen">
+        <div className=" py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+              Explore Life Lessons
+            </h1>
+            <p className="text-xl text-center text-indigo-100 max-w-2xl mx-auto">
+              Discover wisdom and insights shared by our community
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(9)].map((_, i) => (
+              <LessonCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );

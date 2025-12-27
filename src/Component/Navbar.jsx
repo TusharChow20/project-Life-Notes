@@ -25,6 +25,10 @@ export default function Navbar() {
   });
 
   const isPremium = userData?.isPremium || false;
+  const isAdmin = userData?.role === "admin";
+  const profileRoute = isAdmin
+    ? "/dashboard/admin/profile"
+    : "/dashboard/profile";
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -114,7 +118,7 @@ export default function Navbar() {
                   </span>
                 </li>
                 <li>
-                  <Link href="/profile">
+                  <Link href={profileRoute}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
@@ -172,7 +176,6 @@ export default function Navbar() {
                 </li>
               </>
             ) : (
-              // THIS IS THE FIX: Show Login button when NOT logged in
               <li>
                 <Link href="/login" className="btn btn-ghost btn-sm">
                   <svg
@@ -272,7 +275,7 @@ export default function Navbar() {
                 </li>
                 <div className="divider my-1"></div>
                 <li>
-                  <Link href="/profile">
+                  <Link href={profileRoute}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"

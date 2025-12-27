@@ -19,20 +19,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import instance from "@/app/AxiosApi/AxiosInstence";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { X, Loader2 } from "lucide-react";
 import { LessonDetailsSkeleton } from "@/Component/Skeletons";
+
 export default function LessonDetailsPage() {
   const { id: lessonId } = useParams();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
-  // const [showReportModal, setShowReportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
   const [description, setDescription] = useState("");
@@ -48,19 +49,34 @@ export default function LessonDetailsPage() {
     "Copyright infringement",
     "Other",
   ];
-  // const onClose = () => {
-  //   setShowReportModal(false);
-  // };
+
+  // Check authentication and redirect to login
+  const checkAuthAndRedirect = () => {
+    if (!session?.user) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to perform this action",
+        showCancelButton: true,
+        confirmButtonText: "Go to Login",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#10b981",
+        cancelButtonColor: "#6b7280",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const currentUrl = window.location.pathname;
+          router.push(`/login?returnUrl=${encodeURIComponent(currentUrl)}`);
+        }
+      });
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!session?.user) {
-      Swal.fire({
-        icon: "error",
-        title: "Not Logged In",
-        text: "Please log in to report content",
-      });
+    if (!checkAuthAndRedirect()) {
       return;
     }
 
@@ -69,6 +85,7 @@ export default function LessonDetailsPage() {
         icon: "error",
         title: "Select a Reason",
         text: "Please select a reason for reporting",
+        confirmButtonColor: "#10b981",
       });
       return;
     }
@@ -106,6 +123,7 @@ export default function LessonDetailsPage() {
         text:
           error.response?.data?.message ||
           "Failed to submit report. Please try again.",
+        confirmButtonColor: "#10b981",
       });
       document.getElementById("report_modal")?.close();
     } finally {
@@ -187,6 +205,7 @@ export default function LessonDetailsPage() {
     session?.user?.email &&
     data?.creatorEmail &&
     session.user.email === data.creatorEmail;
+
   const calculateReadingTime = (text = "") => {
     const words = text.split(/\s+/).length;
     return Math.max(1, Math.ceil(words / 200));
@@ -203,8 +222,7 @@ export default function LessonDetailsPage() {
   };
 
   const handleLike = async () => {
-    if (!session?.user?.email) {
-      alert("Please log in to like this lesson");
+    if (!checkAuthAndRedirect()) {
       return;
     }
 
@@ -220,13 +238,17 @@ export default function LessonDetailsPage() {
       }
     } catch (error) {
       console.error("Failed to like:", error);
-      alert("Failed to update like status");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Update",
+        text: "Failed to update like status. Please try again.",
+        confirmButtonColor: "#10b981",
+      });
     }
   };
 
   const handleFavorite = async () => {
-    if (!session?.user?.email) {
-      alert("Please log in to save to favorites");
+    if (!checkAuthAndRedirect()) {
       return;
     }
 
@@ -245,11 +267,31 @@ export default function LessonDetailsPage() {
       }
     } catch (error) {
       console.error("Failed to favorite:", error);
-      alert("Failed to update favorite status");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Update",
+        text: "Failed to update favorite status. Please try again.",
+        confirmButtonColor: "#10b981",
+      });
     }
   };
 
   const handleDelete = async () => {
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "Delete Lesson?",
+      text: "This action cannot be undone. Are you sure you want to delete this lesson?",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
     setIsDeleting(true);
 
     try {
@@ -258,17 +300,32 @@ export default function LessonDetailsPage() {
       });
 
       if (response.data.success) {
-        alert("Lesson deleted successfully!");
-        window.location.href = "/public-lessons";
+        await Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Lesson deleted successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        router.push("/public-lessons");
       } else {
-        alert(response.data.message || "Failed to delete lesson");
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Delete",
+          text: response.data.message || "Failed to delete lesson",
+          confirmButtonColor: "#10b981",
+        });
       }
     } catch (error) {
       console.error("Failed to delete:", error);
-      alert("Failed to delete lesson");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Delete",
+        text: "Failed to delete lesson. Please try again.",
+        confirmButtonColor: "#10b981",
+      });
     } finally {
       setIsDeleting(false);
-      setShowDeleteModal(false);
     }
   };
 
@@ -295,8 +352,21 @@ export default function LessonDetailsPage() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Link copied to clipboard!");
+    Swal.fire({
+      icon: "success",
+      title: "Copied!",
+      text: "Link copied to clipboard!",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     setShowShareModal(false);
+  };
+
+  const handleReportClick = () => {
+    if (!checkAuthAndRedirect()) {
+      return;
+    }
+    document.getElementById("report_modal")?.showModal();
   };
 
   if (isLoading) {
@@ -462,7 +532,7 @@ export default function LessonDetailsPage() {
               </div>
             </div>
 
-            {/* 4. Full Description/Story */}
+            {/* Full Description/Story */}
             <div className="prose prose-invert prose-lg max-w-none mb-8">
               {data.description?.split("\n\n").map((paragraph, index) => (
                 <p key={index} className="text-gray-200 leading-relaxed mb-4">
@@ -544,9 +614,7 @@ export default function LessonDetailsPage() {
               </button>
 
               <button
-                onClick={() =>
-                  document.getElementById("report_modal")?.showModal()
-                }
+                onClick={handleReportClick}
                 className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition transform hover:scale-105"
               >
                 <Flag className="w-5 h-5" />
@@ -555,18 +623,28 @@ export default function LessonDetailsPage() {
 
               {isCreator && (
                 <button
-                  onClick={() => handleDelete()}
-                  className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition transform hover:scale-105"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex cursor-pointer items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Trash2 className="w-5 h-5" />
-                  Delete
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-5 h-5" />
+                      Delete
+                    </>
+                  )}
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* 7. Author Card */}
+        {/* Author Card */}
         <div className=" border shadow-xl backdrop-blur-lg rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-white mb-6">
             About the Author
@@ -721,7 +799,15 @@ export default function LessonDetailsPage() {
                   {isSubmitting ? "Submitting..." : "Submit Report"}
                 </button>
 
-                <button className="btn btn-ghost">Cancel</button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() =>
+                    document.getElementById("report_modal")?.close()
+                  }
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>

@@ -140,7 +140,7 @@ export function FeaturedLessons() {
         <div className="flex justify-center mt-12">
           <button
             onClick={() => setShowAll(true)}
-            className="group px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition transform hover:scale-105 flex items-center gap-2"
+            className="group px-8 cursor-pointer py-4 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition transform hover:scale-105 flex items-center gap-2"
           >
             View All {featuredLessons.length} Featured Lessons
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />

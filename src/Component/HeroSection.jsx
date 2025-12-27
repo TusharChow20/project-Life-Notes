@@ -8,8 +8,10 @@ import Lottie from "lottie-react";
 import "swiper/css";
 import "swiper/css/bundle";
 import "swiper/css/pagination";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+  const router = useRouter();
   const slides = [
     {
       title: "Grow Through Life Lessons",
@@ -86,12 +88,15 @@ export default function HeroSection() {
                   .getElementById("featured-lesson")
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold text-green-950"
+              className="px-4 lg:px-6 py-2 cursor-pointer lg:py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold text-green-950"
             >
               Get Started
             </button>
 
-            <button className="px-4 lg:px-6 py-2 lg:py-3 rounded-xl border border-green-400/40 hover:bg-green-400/10 text-sm lg:text-base">
+            <button
+              onClick={() => router.push("/public-lessons")}
+              className="px-4 lg:px-6 py-2 cursor-pointer lg:py-3 rounded-xl border border-green-400/40 hover:bg-green-400/10 text-sm lg:text-base"
+            >
               Explore Lessons
             </button>
           </div>
